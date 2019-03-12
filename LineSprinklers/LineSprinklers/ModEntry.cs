@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using LineSprinklers.Framework;
 using Microsoft.Xna.Framework;
@@ -40,6 +41,9 @@ namespace LineSprinklers
         /// <summary>The warning messages that have already been displayed.</summary>
         private readonly HashSet<string> SuppressWarnings = new HashSet<string>();
 
+        /// <summary>The Json Assets API instance, if loaded.</summary>
+        private IJsonAssetsApi JsonAssets;
+
 
         /*********
         ** Public methods
@@ -49,6 +53,7 @@ namespace LineSprinklers
         public override void Entry(IModHelper helper)
         {
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
         /// <summary>Get an API that other mods can access. This is always called after <see cref="M:StardewModdingAPI.Mod.Entry(StardewModdingAPI.IModHelper)" />.</summary>
@@ -61,11 +66,31 @@ namespace LineSprinklers
         /*********
         ** Private methods
         *********/
+        /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves). All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            // load Json Assets API
+            this.JsonAssets = this.Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
+            if (this.JsonAssets == null)
+            {
+                this.Monitor.Log("Can't access the Json Assets API. Is the mod installed correctly?", LogLevel.Error);
+                return;
+            }
+
+            // inject Json Assets content pack
+            this.JsonAssets.LoadAssets(Path.Combine(this.Helper.DirectoryPath, "assets", "[JA] LineSprinklers"));
+        }
+
         /// <summary>Raised after the game begins a new day (including when the player loads a save).</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>
         private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
+            if (this.JsonAssets == null)
+                return;
+
             // reset sprinkler coverage
             this.Coverage.Clear();
             foreach (var pair in this.GetSprinklerCoverage())
@@ -109,20 +134,12 @@ namespace LineSprinklers
         /// <summary>Get the relative tile coverage by supported sprinkler ID. Note that sprinkler IDs may change after a save is loaded due to Json Assets reallocating IDs.</summary>
         private IDictionary<int, Vector2[]> GetSprinklerCoverage()
         {
-            // get Json Assets API
-            IJsonAssetsApi jsonAssets = this.Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-            if (jsonAssets == null)
-            {
-                this.LogOnce("Can't access the Json Assets API. Is the mod installed correctly?", LogLevel.Error);
-                return new Dictionary<int, Vector2[]>();
-            }
-
             // get sprinkler coverage
             IDictionary<int, Vector2[]> coverage = new Dictionary<int, Vector2[]>();
             foreach (string name in this.Names)
             {
                 // get sprinkler ID
-                int id = jsonAssets.GetBigCraftableId(name);
+                int id = this.JsonAssets.GetBigCraftableId(name);
                 if (id == -1)
                 {
                     this.LogOnce($"Can't find {name} in the Json Assets data. Is the mod installed correctly?", LogLevel.Warn);
