@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using BusLocations.Framework;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -7,54 +8,67 @@ using StardewValley;
 
 namespace BusLocations
 {
+    /// <summary>The mod entry class.</summary>
     public class ModEntry : Mod
     {
-        private static BusLoc[] _busLocs;
-        private static Response[] _busChoices;
+        /*********
+        ** Fields
+        *********/
+        /// <summary>The loaded bus locations.</summary>
+        private BusLoc[] Locations;
+
+        /// <summary>The available bus choices.</summary>
+        private Response[] Choices;
+
 
         /*********
-       ** Public methods
-       *********/
+        ** Public methods
+        *********/
         /// <summary>The mod entry point, called after the mod is first loaded.</summary>
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
-            //Events
             helper.Events.Input.ButtonPressed += OnButtonPressed;
-            
-            //Content Packs
-            var cPacks = helper.ContentPacks.GetOwned().Count();
-            _busChoices = new Response[cPacks + 1];
-            _busLocs = new BusLoc[cPacks];
-            int index = 0;
-            foreach (IContentPack contentPack in helper.ContentPacks.GetOwned())
+
+            // get content packs
+            IList<BusLoc> locations = new List<BusLoc>();
+            foreach (var pack in this.Helper.ContentPacks.GetOwned())
             {
-                Monitor.Log($"Reading content pack: {contentPack.Manifest.Name} {contentPack.Manifest.Version} from {contentPack.DirectoryPath}");
-                _busLocs[index] = contentPack.ReadJsonFile<BusLoc>("content.json");
-                _busChoices[index] = new Response(index.ToString(), $"{_busLocs[index].Displayname} ({_busLocs[index].TicketPrice}g)");
-                index++;
+                this.Monitor.Log($"Reading content pack: {pack.Manifest.Name} {pack.Manifest.Version} from {pack.DirectoryPath}");
+                locations.Add(pack.ReadJsonFile<BusLoc>("content.json"));
             }
-            _busChoices[_busChoices.Length - 1] = new Response("Cancel", "Cancel");
+            this.Locations = locations.ToArray();
+
+            // cache choices
+            IList<Response> choices = new List<Response>(this.Locations.Length);
+            for (int i = 0; i < this.Locations.Length; i++)
+            {
+                var location = this.Locations[i];
+                choices.Add(new Response(i.ToString(), $"{location.DisplayName} ({location.TicketPrice}g)"));
+            }
+            choices.Add(new Response("Cancel", "Cancel"));
+            this.Choices = choices.ToArray();
         }
 
-        /*********
-       ** Private methods
-       *********/
 
+        /*********
+        ** Private methods
+        *********/
         /// <summary>Raised when a button is pressed.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (!(Context.IsWorldReady && (e.Button.IsActionButton() || !Game1.currentLocation.Name.Contains("BusStop")) && Game1.currentLocation.doesTileHaveProperty(7, 11, "Action", "Buildings") == "BusTicket" && (e.Cursor.GrabTile.X == 7.0 && (e.Cursor.GrabTile.Y == 11.0 || e.Cursor.GrabTile.Y == 10.0))))
+            if (!(Context.IsWorldReady && (e.Button.IsActionButton() || !Game1.currentLocation.Name.Contains("BusStop")) && Game1.currentLocation.doesTileHaveProperty(7, 11, "Action", "Buildings") == "BusTicket" && (e.Cursor.GrabTile.X == 7 && (e.Cursor.GrabTile.Y == 11 || e.Cursor.GrabTile.Y == 10))))
                 return;
-            Helper.Input.Suppress(e.Button);
-            if(Game1.MasterPlayer.mailReceived.Contains("ccVault"))
-                Game1.currentLocation.createQuestionDialogue("Where would you like to go?", _busChoices, DialogueAction);
+
+            this.Helper.Input.Suppress(e.Button);
+            if (Game1.MasterPlayer.mailReceived.Contains("ccVault"))
+                Game1.currentLocation.createQuestionDialogue("Where would you like to go?", Choices, DialogueAction);
             else
                 Game1.drawObjectDialogue("Out of service");
-
         }
+
         /// <summary>Method that gets ran after the QuestionDialogue</summary>
         /// <param name="who">The player</param>
         /// <param name="whichAnswer">The Answer</param>
@@ -64,15 +78,14 @@ namespace BusLocations
                 return;
             int index = int.Parse(whichAnswer);
             NPC characterFromName = Game1.getCharacterFromName("Pam");
-            if (Game1.player.Money >= _busLocs[index].TicketPrice && Game1.currentLocation.characters.Contains(characterFromName) && (characterFromName).getTileLocation().Equals(new Vector2(11f, 10f)))
+            if (Game1.player.Money >= Locations[index].TicketPrice && Game1.currentLocation.characters.Contains(characterFromName) && characterFromName.getTileLocation() == new Vector2(11, 10))
             {
-                Farmer player = Game1.player;
-                player.Money -= _busLocs[index].TicketPrice;
+                Game1.player.Money -= Locations[index].TicketPrice;
                 Game1.player.Halt();
                 Game1.player.freezePause = 700;
-                Game1.warpFarmer(_busLocs[index].Mapname, _busLocs[index].DestinationX, _busLocs[index].DestinationY, _busLocs[index].ArrivalFacing);
+                Game1.warpFarmer(Locations[index].MapName, Locations[index].DestinationX, Locations[index].DestinationY, Locations[index].ArrivalFacing);
             }
-            else if (Game1.player.Money < _busLocs[index].TicketPrice)
+            else if (Game1.player.Money < Locations[index].TicketPrice)
                 Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\Locations:BusStop_NotEnoughMoneyForTicket"));
             else
                 Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\Locations:BusStop_NoDriver"));

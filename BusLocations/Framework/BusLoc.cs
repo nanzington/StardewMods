@@ -2,11 +2,11 @@
 {
     internal class BusLoc
     {
-        public string Mapname;
-        public string Displayname;
-        public int DestinationX;
-        public int DestinationY;
-        public int ArrivalFacing;
-        public int TicketPrice;
+        public string MapName { get; set; }
+        public string DisplayName { get; set; }
+        public int DestinationX { get; set; }
+        public int DestinationY { get; set; }
+        public int ArrivalFacing { get; set; }
+        public int TicketPrice { get; set; }
     }
 }
