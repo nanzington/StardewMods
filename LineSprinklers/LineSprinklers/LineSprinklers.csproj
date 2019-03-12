@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Framework\IJsonAssetsApi.cs" />
     <Compile Include="Framework\LineSprinklersApi.cs" />
+    <Compile Include="Framework\ModConfig.cs" />
     <Compile Include="ILineSprinklersApi.cs" />
     <Compile Include="ModEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
