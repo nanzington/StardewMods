@@ -165,62 +165,62 @@ namespace LineSprinklers
             switch (name)
             {
                 case "Line Sprinkler (D)":
-                    for (int y = 0; y < this.Config.BasicRange; y++)
+                    for (int y = 0; y <= this.Config.BasicRange; y++)
                         yield return new Vector2(0, y);
                     break;
 
                 case "Line Sprinkler (U)":
-                    for (int y = 0; y < this.Config.BasicRange; y++)
+                    for (int y = 0; y <= this.Config.BasicRange; y++)
                         yield return new Vector2(0, -y);
                     break;
 
                 case "Line Sprinkler (L)":
-                    for (int x = 0; x < this.Config.BasicRange; x++)
+                    for (int x = 0; x <= this.Config.BasicRange; x++)
                         yield return new Vector2(-x, 0);
                     break;
 
                 case "Line Sprinkler (R)":
-                    for (int x = 0; x < this.Config.BasicRange; x++)
+                    for (int x = 0; x <= this.Config.BasicRange; x++)
                         yield return new Vector2(x, 0);
                     break;
 
                 case "Quality Line Sprinkler (D)":
-                    for (int y = 0; y < this.Config.QualityRange; y++)
+                    for (int y = 0; y <= this.Config.QualityRange; y++)
                         yield return new Vector2(0, y);
                     break;
 
                 case "Quality Line Sprinkler (U)":
-                    for (int y = 0; y < this.Config.QualityRange; y++)
+                    for (int y = 0; y <= this.Config.QualityRange; y++)
                         yield return new Vector2(0, -y);
                     break;
 
                 case "Quality Line Sprinkler (L)":
-                    for (int x = 0; x < this.Config.QualityRange; x++)
+                    for (int x = 0; x <= this.Config.QualityRange; x++)
                         yield return new Vector2(-x, 0);
                     break;
 
                 case "Quality Line Sprinkler (R)":
-                    for (int x = 0; x < this.Config.QualityRange; x++)
+                    for (int x = 0; x <= this.Config.QualityRange; x++)
                         yield return new Vector2(x, 0);
                     break;
 
                 case "Iridium Line Sprinkler (D)":
-                    for (int y = 0; y < this.Config.IridiumRange; y++)
+                    for (int y = 0; y <= this.Config.IridiumRange; y++)
                         yield return new Vector2(0, y);
                     break;
 
                 case "Iridium Line Sprinkler (U)":
-                    for (int y = 0; y < this.Config.IridiumRange; y++)
+                    for (int y = 0; y <= this.Config.IridiumRange; y++)
                         yield return new Vector2(0, -y);
                     break;
 
                 case "Iridium Line Sprinkler (L)":
-                    for (int x = 0; x < this.Config.IridiumRange; x++)
+                    for (int x = 0; x <= this.Config.IridiumRange; x++)
                         yield return new Vector2(-x, 0);
                     break;
 
                 case "Iridium Line Sprinkler (R)":
-                    for (int x = 0; x < this.Config.IridiumRange; x++)
+                    for (int x = 0; x <= this.Config.IridiumRange; x++)
                         yield return new Vector2(x, 0);
                     break;
             }
