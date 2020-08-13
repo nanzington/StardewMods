@@ -59,6 +59,24 @@ namespace LineSprinklers
 
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Input.ButtonReleased += OnButtonRelease;
+        }
+
+        private void OnButtonRelease(object sender, ButtonReleasedEventArgs e) {
+            if (e.Button == SButton.R || e.Button == SButton.LeftStick || e.Button == SButton.MouseMiddle) {
+                if (Game1.player.currentLocation.getObjectAtTile((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y) != null) {
+                    if (Game1.player.currentLocation.getObjectAtTile((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y).DisplayName.Contains("Iridium Line Sprinkler")) {
+                        Game1.player.currentLocation.objects.Remove(e.Cursor.GrabTile);
+                        Game1.player.dropItem(new StardewValley.Object(645, 1));
+                    } else if (Game1.player.currentLocation.getObjectAtTile((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y).DisplayName.Contains("Quality Line Sprinkler")) {
+                        Game1.player.currentLocation.objects.Remove(e.Cursor.GrabTile);
+                        Game1.player.dropItem(new StardewValley.Object(621, 1));
+                    } else if (Game1.player.currentLocation.getObjectAtTile((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y).DisplayName.Contains("Line Sprinkler")) {
+                        Game1.player.currentLocation.objects.Remove(e.Cursor.GrabTile);
+                        Game1.player.dropItem(new StardewValley.Object(599, 1));
+                    }
+                }
+            }
         }
 
         /// <summary>Get an API that other mods can access. This is always called after <see cref="M:StardewModdingAPI.Mod.Entry(StardewModdingAPI.IModHelper)" />.</summary>
@@ -118,6 +136,8 @@ namespace LineSprinklers
                 }
             }
         }
+
+
 
         /// <summary>Get all in-game locations.</summary>
         private IEnumerable<GameLocation> GetLocations()
