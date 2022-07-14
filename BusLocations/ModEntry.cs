@@ -20,6 +20,8 @@ namespace BusLocations
         /// <summary>The available bus choices.</summary>
         private Response[] Choices;
 
+        /// <summary>Api for integrating other mods</summary>
+        private BusStopEventsApi busStopEvents;
 
         /*********
         ** Public methods
@@ -48,6 +50,13 @@ namespace BusLocations
             }
             choices.Add(new Response("Cancel", "Cancel"));
             this.Choices = choices.ToArray();
+
+            this.busStopEvents = new BusStopEventsApi();
+        }
+
+        public override object GetApi()
+        {
+            return this.busStopEvents;
         }
 
 
@@ -101,9 +110,16 @@ namespace BusLocations
             if (Game1.player.Money >= Locations[index].TicketPrice && Game1.currentLocation.characters.Contains(characterFromName) && characterFromName.getTileLocation() == new Vector2(11, 10))
             {
                 Game1.player.Money -= Locations[index].TicketPrice;
-                Game1.player.Halt();
-                Game1.player.freezePause = 700;
-                Game1.warpFarmer(Locations[index].MapName, Locations[index].DestinationX, Locations[index].DestinationY, Locations[index].ArrivalFacing);
+                if (busStopEvents.HasJumpToOverride())
+                {
+                    //Let the other mod handle warping
+                    busStopEvents.SetGoingTo(Locations[index]);
+                    busStopEvents.JumpToLocation();
+                } else { 
+                    Game1.player.Halt();
+                    Game1.player.freezePause = 700;
+                    Game1.warpFarmer(Locations[index].MapName, Locations[index].DestinationX, Locations[index].DestinationY, Locations[index].ArrivalFacing);
+                }
             }
             else if (Game1.player.Money < Locations[index].TicketPrice)
                 Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\Locations:BusStop_NotEnoughMoneyForTicket"));
