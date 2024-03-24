@@ -80,7 +80,8 @@ namespace BusLocations
         /// if (Game1.currentLocation.doesTileHaveProperty(17, 11, "Action", "Buildings") != "BusTicket")
         ///     return;
 
-            if (!(e.Cursor.GrabTile.X == 17 && (e.Cursor.GrabTile.Y == 11 || e.Cursor.GrabTile.Y == 10)))
+        /// for some reason the Ticket Machine extends all the way down to Tile 12 so let's add it here.
+            if (!(e.Cursor.GrabTile.X == 17 && (e.Cursor.GrabTile.Y == 12 || e.Cursor.GrabTile.Y == 11 || e.Cursor.GrabTile.Y == 10)))
                 return;
 
             this.Helper.Input.Suppress(e.Button);
