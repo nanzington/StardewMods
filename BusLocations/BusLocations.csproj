@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IgnoreModFilePaths>BusLocations.dll, BusLocations.pdb</IgnoreModFilePaths>
+    <IgnoreModFilePaths>BusLocations.dll</IgnoreModFilePaths>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +13,6 @@
 
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="$(OutputPath)\BusLocations.dll" DestinationFolder="$(OutputPath)\BusLocations" />
-    <Copy SourceFiles="$(OutputPath)\BusLocations.pdb" DestinationFolder="$(OutputPath)\BusLocations" />
     <Copy SourceFiles="manifest.json" DestinationFolder="$(OutputPath)\BusLocations" />
   </Target>
 
