@@ -99,7 +99,7 @@ namespace BusLocations
                 return;
             int index = int.Parse(whichAnswer);
             NPC characterFromName = Game1.getCharacterFromName("Pam");
-            if (Game1.player.Money >= Locations[index].TicketPrice && Game1.currentLocation.characters.Contains(characterFromName) && characterFromName.Position == new Vector2(11, 10))
+            if (Game1.player.Money >= Locations[index].TicketPrice && Game1.currentLocation.characters.Contains(characterFromName) && characterFromName.Tile == new Vector2(21, 10))
             {
                 Game1.player.Money -= Locations[index].TicketPrice;
                 Game1.player.Halt();

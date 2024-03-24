@@ -4,11 +4,18 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IgnoreModFilePaths>BusLocations.dll, BusLocations.pdb</IgnoreModFilePaths>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
   </ItemGroup>
+
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <Copy SourceFiles="$(OutputPath)\BusLocations.dll" DestinationFolder="$(OutputPath)\BusLocations" />
+    <Copy SourceFiles="$(OutputPath)\BusLocations.pdb" DestinationFolder="$(OutputPath)\BusLocations" />
+    <Copy SourceFiles="manifest.json" DestinationFolder="$(OutputPath)\BusLocations" />
+  </Target>
 
   <ItemGroup>
     <None Update="[BL] Desert\content.json">
@@ -17,9 +24,6 @@
     <None Update="[BL] Desert\manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="manifest.json" />
   </ItemGroup>
-
 </Project>
