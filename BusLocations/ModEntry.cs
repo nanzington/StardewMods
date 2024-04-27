@@ -109,8 +109,11 @@ namespace BusLocations
             }
             else if (Game1.player.Money < Locations[index].TicketPrice)
                 Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\Locations:BusStop_NotEnoughMoneyForTicket"));
-            else
-                Game1.drawObjectDialogue(Game1.content.LoadString("Strings\\Locations:BusStop_NoDriver"));
+              else
+                Game1.player.Money -= Locations[index].TicketPrice;
+                Game1.player.Halt();
+                Game1.player.freezePause = 700;
+                Game1.warpFarmer(Locations[index].MapName, Locations[index].DestinationX, Locations[index].DestinationY, Locations[index].ArrivalFacing);
         }
     }
 }
